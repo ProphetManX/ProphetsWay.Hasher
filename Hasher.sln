@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28729.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProphetsWay.Hasher", "ProphetsWay.Hasher\ProphetsWay.Hasher.csproj", "{1A82D7D2-9CE4-4D8C-B8FC-DEB606005C17}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28891A6F-940F-4AE9-BF9D-925F44C93FE6}"
+	ProjectSection(SolutionItems) = preProject
+		CHANGELOG.md = CHANGELOG.md
+		README.md = README.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1A82D7D2-9CE4-4D8C-B8FC-DEB606005C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A82D7D2-9CE4-4D8C-B8FC-DEB606005C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A82D7D2-9CE4-4D8C-B8FC-DEB606005C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A82D7D2-9CE4-4D8C-B8FC-DEB606005C17}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CCC911DC-C581-44D8-B226-113E23C61743}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net451;net452;net46;net461;net471;netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;</TargetFrameworks>
+    <RootNamespace>ProphetsWay.Utilities</RootNamespace>
+    <AssemblyName>ProphetsWay.Hasher</AssemblyName>
+    <ApplicationIcon />
+    <Win32Resource />
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <SignAssembly>false</SignAssembly>
+    <Authors>G. Gordon Nasseri</Authors>
+    <Company>ProphetsWay</Company>
+    <Description>
+      A simple and easy to use Logging library that allows for customizable outputs for log entries.
+
+      Go to https://github.com/ProphetManX/ProphetsWay.Hasher for more information.
+
+      Just one of a few Utility projects I've created for myself and wanted to share.  The namespace for the projects are all "ProphetsWay.Utilities" and the class to use is "Hasher".
+
+      To Use:
+      add "using ProphetsWay.Utilities;" to your class
+
+      and then you can call the Logger directly.
+      Logger.AddDestination(new ConsoleDestination());
+      Logger.Debug("Hello World!");
+    </Description>
+    
+    <!-- Assembly Override Properties -->
+    <PackageRequireLicenseAcceptance />
+    <PackageId />
+    <Version />
+    <Authors />
+    <Company />
+    <Product />
+
+    <Copyright />
+    <PackageLicenseUrl />
+    <PackageProjectUrl />
+    <PackageIconUrl />
+    <RepositoryUrl />
+    <RepositoryType />
+    <PackageTags />
+    <PackageReleaseNotes />
+    <NeutralLanguage />
+    <AssemblyVersion />
+    <FileVersion />
+    <InformationalVersion />
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ProphetsWay.Logger" Version="1.2.0" />
+  </ItemGroup>
+
+
+</Project>
