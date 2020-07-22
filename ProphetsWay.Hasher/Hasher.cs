@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ProphetsWay.Utilities
 {
-    public static class Hasher
+	public static class Hasher
 	{
 		private const int BUFFER_SIZE = 1024*1024*128;
 
@@ -46,24 +46,24 @@ namespace ProphetsWay.Utilities
 			var sha512Worker = new HashWorker(HashTypes.SHA512);
 
 
-            await Task.Run(() =>
-            {
-                var bRead = 0;
-                do
-                {
-                    bRead = stream.Read(buffer, 0, buffer.Length);
+			await Task.Run(() =>
+			{
+				var bRead = 0;
+				do
+				{
+					bRead = stream.Read(buffer, 0, buffer.Length);
 
-                    var tasks = new List<Task>
-                    {
-                        Task.Run(() => md5Worker.GenerateIncrementalHash(buffer, bRead)),
-                        Task.Run(() => sha1Worker.GenerateIncrementalHash(buffer, bRead)),
-                        Task.Run(() => sha256Worker.GenerateIncrementalHash(buffer, bRead)),
-                        Task.Run(() => sha512Worker.GenerateIncrementalHash(buffer, bRead))
-                    };
+					var tasks = new List<Task>
+					{
+						Task.Run(() => md5Worker.GenerateIncrementalHash(buffer, bRead)),
+						Task.Run(() => sha1Worker.GenerateIncrementalHash(buffer, bRead)),
+						Task.Run(() => sha256Worker.GenerateIncrementalHash(buffer, bRead)),
+						Task.Run(() => sha512Worker.GenerateIncrementalHash(buffer, bRead))
+					};
 
-                    Task.WaitAll(tasks.ToArray());
-                } while (bRead > 0);
-            });
+					Task.WaitAll(tasks.ToArray());
+				} while (bRead > 0);
+			});
 
 
 			var ret = new HashCollection(md5Worker.Hash, sha1Worker.Hash, sha256Worker.Hash, sha512Worker.Hash);
