@@ -37,7 +37,14 @@ namespace ProphetsWay.Utilities
 			return GenerateHash(fileInfo.OpenRead(), hashType);
 		}
 
-		public async static Task<HashCollection> GenerateHashes(this Stream stream)
+		public static HashCollection GenerateHashes(this Stream stream)
+		{
+			var task = Task.Run(() => { return GenerateHashesAsync(stream); });
+			task.Wait();
+			return task.Result;
+		}
+
+		public async static Task<HashCollection> GenerateHashesAsync(this Stream stream)
 		{
 			var buffer = new byte[BUFFER_SIZE];
 			var md5Worker = new HashWorker(HashTypes.MD5);
