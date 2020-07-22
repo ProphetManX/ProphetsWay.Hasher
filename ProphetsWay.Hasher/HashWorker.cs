@@ -48,7 +48,7 @@ namespace ProphetsWay.Utilities
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, $"Error when trying to compute a [{_hashType}] hash on a Stream.");
+                throw new Exception($"Error when trying to compute a [{_hashType}] hash on a Stream.", ex);
             }
         }
 
