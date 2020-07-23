@@ -28,6 +28,7 @@ steps:
     Company: 'ProphetsWay'
     Product: 'Hasher'
     Description: 'Simple hashing library to make it easier to generate file checksums.'
+    PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
     RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
     RepositoryType: 'GitHub'
     VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
