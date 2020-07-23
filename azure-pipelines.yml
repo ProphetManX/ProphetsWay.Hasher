@@ -10,9 +10,16 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
+  MajorVersion: '1'
+  MinorVersion: '0'
+  PatchVersion: '0'
+  SemanticVersion: '$(MajorVersion).$(MinorVersion).$(PatchVersion)'
+  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
+  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  
 
 steps:
 - task: Assembly-Info-NetCore@2
