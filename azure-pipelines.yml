@@ -125,7 +125,7 @@ stages:
 
   - stage: DeployBeta
     displayName: Deploy Beta NuGet Package
-    dependsOn: Build
+    dependsOn: DeployAlpha
     jobs:
     - deployment: DeployBeta
       displayName: 'Deploy Beta NuGet Package Job'
