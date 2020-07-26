@@ -129,7 +129,7 @@ stages:
     jobs:
     - deployment: DeployBeta
       displayName: 'Deploy Beta NuGet Package Job'
-      continueOnError: "true"
+      continueOnError: "false"
       pool:
         vmImage: $(vmImage)
       environment: 'Hasher Beta NuGet'
@@ -166,5 +166,58 @@ stages:
               inputs:
                 command: 'push'
                 packagesToPush: '$(build.artifactstagingdirectory)/drop/beta/*.nupkg'
+                nuGetFeedType: 'external'
+                publishFeedCredentials: 'ProphetManX''s NuGet'
+
+  - stage: DeployRelease
+    displayName: Deploy Release NuGet Package
+    dependsOn: DeployBeta
+    jobs:
+    - deployment: DeployRelease
+      displayName: 'Deploy Release NuGet Package Job'
+      continueOnError: "false"
+      pool:
+        vmImage: $(vmImage)
+      environment: 'Hasher Release NuGet'
+      strategy: 
+        runOnce:
+          deploy:
+            steps:
+            - task: DownloadBuildArtifacts@0
+              displayName: Download Artifact
+              inputs:
+                buildType: 'current'
+                downloadType: 'single'
+                artifactName: 'drop'
+                downloadPath: '$(build.artifactstagingdirectory)'
+
+            - task: GitHubRelease@1
+              displayName: 'Delete GitHub Beta Release'
+              inputs:
+                gitHubConnection: 'ProphetsWay@GitHub'
+                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
+                action: 'delete'
+                tag: '$(BetaVersion)'
+
+            - task: GitHubRelease@1
+              displayName: 'Create GitHub Release'
+              inputs:
+                gitHubConnection: 'ProphetsWay@GitHub'
+                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
+                action: 'create'
+                target: '$(Build.SourceVersion)'
+                tagSource: 'userSpecifiedTag'
+                tag: '$(SemanticVersion)'
+                title: '$(SemanticVersion)'
+                releaseNotesFilePath: '$(build.artifactstagingdirectory)/drop/changelog.md'
+                assets: '$(build.artifactstagingdirectory)/drop/release/*.nupkg'
+                changeLogCompareToRelease: 'lastFullRelease'
+                changeLogType: 'commitBased'
+
+            - task: NuGetCommand@2
+              displayName: 'Push Release NuGet Package'
+              inputs:
+                command: 'push'
+                packagesToPush: '$(build.artifactstagingdirectory)/drop/release/*.nupkg'
                 nuGetFeedType: 'external'
                 publishFeedCredentials: 'ProphetManX''s NuGet'
