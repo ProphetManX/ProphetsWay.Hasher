@@ -145,6 +145,22 @@ stages:
                 artifactName: 'drop'
                 downloadPath: '$(build.artifactstagingdirectory)'
 
+            - task: GitHubRelease@1
+              displayName: 'Create GitHub Beta Release'
+              inputs:
+                gitHubConnection: 'ProphetsWay@GitHub'
+                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
+                action: 'create'
+                target: '$(Build.SourceVersion)'
+                tagSource: 'userSpecifiedTag'
+                tag: '$(BetaVersion)'
+                title: '$(BetaVersion)'
+                releaseNotesFilePath: '$(build.artifactstagingdirectory)/drop/changelog.md'
+                assets: '$(build.artifactstagingdirectory)/drop/beta/*.nupkg'
+                isPreRelease: true
+                changeLogCompareToRelease: 'lastFullRelease'
+                changeLogType: 'commitBased'
+
             - task: NuGetCommand@2
               displayName: 'Push Beta NuGet Package'
               inputs:
