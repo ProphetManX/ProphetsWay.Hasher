@@ -111,7 +111,7 @@ stages:
   - stage: DeployAlpha
     displayName: Deploy Alpha NuGet Package
     dependsOn: Build
-    condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+    condition: and(succeeded('Build'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
     - job: DeployAlpha
       displayName: 'Deploy Alpha NuGet Package Job'
@@ -138,7 +138,7 @@ stages:
   - stage: DeployBeta
     displayName: Deploy Beta NuGet Package
     dependsOn: DeployAlpha
-    condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+    condition: and(succeeded('DeployAlpha'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
     - deployment: DeployBeta
       displayName: 'Deploy Beta NuGet Package Job'
@@ -185,7 +185,7 @@ stages:
   - stage: DeployRelease
     displayName: Deploy Release NuGet Package
     dependsOn: DeployBeta
-    condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+    condition: and(succeeded('DeployBeta'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     jobs:
     - deployment: DeployRelease
       displayName: 'Deploy Release NuGet Package Job'
