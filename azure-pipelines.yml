@@ -6,9 +6,6 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'windows-latest'
-
 variables:
   MajorVersion: '1'
   MinorVersion: '0'
@@ -19,82 +16,87 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  
-
-steps:
-- task: Assembly-Info-NetCore@2
-  inputs:
-    Path: '$(Build.SourcesDirectory)'
-    FileNames: '**/ProphetsWay.Hasher.csproj'
-    InsertAttributes: true
-    FileEncoding: 'auto'
-    WriteBOM: false
-    PackageRequireLicenseAcceptance: true
-    PackageId: 'ProphetsWay.Hasher'
-    Authors: 'G. Gordon Nasseri'
-    Company: 'ProphetsWay'
-    Product: 'Hasher'
-    Description: 'Simple hashing library to make it easier to generate file checksums.'
-    PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
-    RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
-    RepositoryType: 'GitHub'
-    VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-    FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-    InformationalVersion: '$(SemanticVersion)'
-    PackageVersion: '$(SemanticVersion)'
-    LogLevel: 'verbose'
-    FailOnWarning: false
-    DisableTelemetry: false
+  vmImage: 'windows-latest'
 
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'build'
+jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImage)
 
-- task: VSTest@2
-  inputs:
-    testSelector: 'testAssemblies'
-    testAssemblyVer2: |
-      **\*test*.dll
-      !**\*TestAdapter.dll
-      !**\obj\**
-    searchFolder: '$(System.DefaultWorkingDirectory)'
-    diagnosticsEnabled: true
+    steps:
+    - task: Assembly-Info-NetCore@2
+      inputs:
+        Path: '$(Build.SourcesDirectory)'
+        FileNames: '**/ProphetsWay.Hasher.csproj'
+        InsertAttributes: true
+        FileEncoding: 'auto'
+        WriteBOM: false
+        PackageRequireLicenseAcceptance: true
+        PackageId: 'ProphetsWay.Hasher'
+        Authors: 'G. Gordon Nasseri'
+        Company: 'ProphetsWay'
+        Product: 'Hasher'
+        Description: 'Simple hashing library to make it easier to generate file checksums.'
+        PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
+        RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
+        RepositoryType: 'GitHub'
+        VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+        FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+        InformationalVersion: '$(SemanticVersion)'
+        PackageVersion: '$(SemanticVersion)'
+        LogLevel: 'verbose'
+        FailOnWarning: false
+        DisableTelemetry: false
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-    packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
-    versioningScheme: 'byEnvVar'
-    versionEnvVar: 'AlphaVersion'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'build'
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-    packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
-    versioningScheme: 'byEnvVar'
-    versionEnvVar: 'BetaVersion'
+    - task: VSTest@2
+      inputs:
+        testSelector: 'testAssemblies'
+        testAssemblyVer2: |
+          **\*test*.dll
+          !**\*TestAdapter.dll
+          !**\obj\**
+        searchFolder: '$(System.DefaultWorkingDirectory)'
+        diagnosticsEnabled: true
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'pack'
-    packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-    packDirectory: '$(Build.ArtifactStagingDirectory)\release'
-    versioningScheme: 'byEnvVar'
-    versionEnvVar: 'SemanticVersion'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+        packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'AlphaVersion'
 
-- task: CopyFiles@2
-  inputs:
-    Contents: 'CHANGELOG.md'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\'
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+        packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'BetaVersion'
 
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'pack'
+        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+        packDirectory: '$(Build.ArtifactStagingDirectory)\release'
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: 'SemanticVersion'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    - task: CopyFiles@2
+      inputs:
+        Contents: 'CHANGELOG.md'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)\'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
 
 
