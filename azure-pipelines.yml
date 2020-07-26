@@ -18,93 +18,119 @@ variables:
   buildConfiguration: 'Release'
   vmImage: 'windows-latest'
 
+stages:
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+      - job: Build
+        displayName: Build
+        pool:
+          vmImage: $(vmImage)
 
-jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImage)
+        steps:
+        - task: Assembly-Info-NetCore@2
+          displayName: 'Set Assembly Info'
+          inputs:
+            Path: '$(Build.SourcesDirectory)'
+            FileNames: '**/ProphetsWay.Hasher.csproj'
+            InsertAttributes: true
+            FileEncoding: 'auto'
+            WriteBOM: false
+            PackageRequireLicenseAcceptance: true
+            PackageId: 'ProphetsWay.Hasher'
+            Authors: 'G. Gordon Nasseri'
+            Company: 'ProphetsWay'
+            Product: 'Hasher'
+            Description: 'Simple hashing library to make it easier to generate file checksums.'
+            PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
+            RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
+            RepositoryType: 'GitHub'
+            VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+            FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+            InformationalVersion: '$(SemanticVersion)'
+            PackageVersion: '$(SemanticVersion)'
+            LogLevel: 'verbose'
+            FailOnWarning: false
+            DisableTelemetry: false
 
-    steps:
-    - task: Assembly-Info-NetCore@2
-      displayName: 'Set Assembly Info'
-      inputs:
-        Path: '$(Build.SourcesDirectory)'
-        FileNames: '**/ProphetsWay.Hasher.csproj'
-        InsertAttributes: true
-        FileEncoding: 'auto'
-        WriteBOM: false
-        PackageRequireLicenseAcceptance: true
-        PackageId: 'ProphetsWay.Hasher'
-        Authors: 'G. Gordon Nasseri'
-        Company: 'ProphetsWay'
-        Product: 'Hasher'
-        Description: 'Simple hashing library to make it easier to generate file checksums.'
-        PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
-        RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
-        RepositoryType: 'GitHub'
-        VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-        FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-        InformationalVersion: '$(SemanticVersion)'
-        PackageVersion: '$(SemanticVersion)'
-        LogLevel: 'verbose'
-        FailOnWarning: false
-        DisableTelemetry: false
+        - task: DotNetCoreCLI@2
+          displayName: 'Build Solution'
+          inputs:
+            command: 'build'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build Solution'
-      inputs:
-        command: 'build'
+        - task: VSTest@2
+          displayName: 'Run Unit Tests'
+          inputs:
+            testSelector: 'testAssemblies'
+            testAssemblyVer2: |
+              **\*test*.dll
+              !**\*TestAdapter.dll
+              !**\obj\**
+            searchFolder: '$(System.DefaultWorkingDirectory)'
+            diagnosticsEnabled: true
 
-    - task: VSTest@2
-      displayName: 'Run Unit Tests'
-      inputs:
-        testSelector: 'testAssemblies'
-        testAssemblyVer2: |
-          **\*test*.dll
-          !**\*TestAdapter.dll
-          !**\obj\**
-        searchFolder: '$(System.DefaultWorkingDirectory)'
-        diagnosticsEnabled: true
+        - task: DotNetCoreCLI@2
+          displayName: 'Assemble Alpha NuGet Package'
+          inputs:
+            command: 'pack'
+            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+            packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: 'AlphaVersion'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Assemble Alpha NuGet Package'
-      inputs:
-        command: 'pack'
-        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-        packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'AlphaVersion'
+        - task: DotNetCoreCLI@2
+          displayName: 'Assemble Beta NuGet Package'
+          inputs:
+            command: 'pack'
+            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+            packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: 'BetaVersion'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Assemble Beta NuGet Package'
-      inputs:
-        command: 'pack'
-        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-        packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'BetaVersion'
+        - task: DotNetCoreCLI@2
+          displayName: 'Assemble Release NuGet Package'
+          inputs:
+            command: 'pack'
+            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
+            packDirectory: '$(Build.ArtifactStagingDirectory)\release'
+            versioningScheme: 'byEnvVar'
+            versionEnvVar: 'SemanticVersion'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Assemble Release NuGet Package'
-      inputs:
-        command: 'pack'
-        packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-        packDirectory: '$(Build.ArtifactStagingDirectory)\release'
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'SemanticVersion'
+        - task: CopyFiles@2
+          displayName: 'Copy Changelog to Staging'
+          inputs:
+            Contents: 'CHANGELOG.md'
+            TargetFolder: '$(Build.ArtifactStagingDirectory)\'
 
-    - task: CopyFiles@2
-      displayName: 'Copy Changelog to Staging'
-      inputs:
-        Contents: 'CHANGELOG.md'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)\'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Artifacts'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'drop'
+            publishLocation: 'Container'
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish Artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+  - stage: Deploy
+    displayName: Deploy Alpha NuGet Package
+    dependsOn: Build
+    jobs:
+    - job: DeployAlpha
+      displayName: 'Deploy Alpha NuGet Package Job'
+      continueOnError: "true"
+      pool:
+        vmImage: $(vmImage)
+      steps:
+      - task: DownloadBuildArtifacts@0
+        displayName: Download Artifact
+        inputs:
+          buildType: 'current'
+          downloadType: 'single'
+          artifactName: 'drop'
+          downloadPath: '$(build.artifactstagingdirectory)'
 
-
+      - task: NuGetCommand@2
+        displayName: 'Push Alpha NuGet Package'
+        inputs:
+          command: 'push'
+          packagesToPush: '$(System.DefaultWorkingDirectory)/Build/drop/alpha/*.nupkg'
+          nuGetFeedType: 'external'
+          publishFeedCredentials: 'ProphetManX''s NuGet'
