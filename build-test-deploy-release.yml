@@ -11,8 +11,23 @@ parameters:
 
 
 stages:
+  - stage: PullRequest
+    displayName: Pull Request Stage
+    condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
+    jobs:
+    - job: Build
+      displayName: PR Build Stage
+      pool:
+        vmImage: ${{parameters.vmImage}}
+      
+      steps:
+      - template: build-and-test.yml
+        parameters:
+          vmImage: ${{parameters.vmImage}}
+
   - stage: Build
     displayName: Build Stage
+    condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
     variables:
       SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
       AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
@@ -29,7 +44,6 @@ stages:
         
         - task: Assembly-Info-NetCore@2
           displayName: 'Set Assembly Info'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             Path: '$(Build.SourcesDirectory)'
             FileNames: '${{parameters.targetProject}}'
@@ -59,7 +73,6 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Alpha NuGet Package'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -69,7 +82,6 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Beta NuGet Package'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -79,7 +91,6 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Release NuGet Package'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -89,14 +100,12 @@ stages:
 
         - task: CopyFiles@2
           displayName: 'Copy Changelog to Staging'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             Contents: 'CHANGELOG.md'
             TargetFolder: '$(Build.ArtifactStagingDirectory)\'
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifacts'
-          condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
             ArtifactName: 'drop'
@@ -105,7 +114,6 @@ stages:
   - stage: DeployAlpha
     displayName: Deploy Alpha NuGet Package
     dependsOn: Build
-    condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
     jobs:
     - job: DeployAlpha
       displayName: 'Deploy Alpha NuGet Package Job'
