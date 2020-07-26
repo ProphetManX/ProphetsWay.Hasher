@@ -110,7 +110,8 @@ stages:
 
   - stage: DeployAlpha
     displayName: Deploy Alpha NuGet Package
-    dependsOn: CiBuild
+    dependsOn: Build
+    condition: succeeded()
     jobs:
     - job: DeployAlpha
       displayName: 'Deploy Alpha NuGet Package Job'
