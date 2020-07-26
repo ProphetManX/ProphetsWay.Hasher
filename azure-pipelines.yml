@@ -53,21 +53,9 @@ stages:
             FailOnWarning: false
             DisableTelemetry: false
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Build Solution'
-          inputs:
-            command: 'build'
-
-        - task: VSTest@2
-          displayName: 'Run Unit Tests'
-          inputs:
-            testSelector: 'testAssemblies'
-            testAssemblyVer2: |
-              **\*test*.dll
-              !**\*TestAdapter.dll
-              !**\obj\**
-            searchFolder: '$(System.DefaultWorkingDirectory)'
-            diagnosticsEnabled: true
+        - template: build-and-test.yml
+          parameters:
+            vmImage: $(vmImage)
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Alpha NuGet Package'
