@@ -15,8 +15,8 @@ stages:
     displayName: Pull Request Stage
     condition: ne(variables['Build.SourceBranch'], 'refs/heads/master')
     jobs:
-    - job: Build
-      displayName: PR Build Stage
+    - job: PrBuild
+      displayName: PR Build
       pool:
         vmImage: ${{parameters.vmImage}}
       
@@ -33,80 +33,80 @@ stages:
       AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
       BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
     jobs:
-    - job: Build
+    - job: CiBuild
       displayName: CI Build
       pool:
         vmImage: ${{parameters.vmImage}}
 
-        steps:
-        - task: Assembly-Info-NetCore@2
-          displayName: 'Set Assembly Info'
-          inputs:
-            Path: '$(Build.SourcesDirectory)'
-            FileNames: '${{parameters.targetProject}}'
-            InsertAttributes: true
-            FileEncoding: 'auto'
-            WriteBOM: false
-            PackageRequireLicenseAcceptance: true
-            PackageId: 'ProphetsWay.${{parameters.libraryName}}'
-            Authors: 'G. Gordon Nasseri'
-            Company: 'ProphetsWay'
-            Product: '${{parameters.libraryName}}'
-            Description: '${{parameters.description}}'
-            PackageLicenseUrl: '${{parameters.licenseUrl}}'
-            RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.${{parameters.libraryName}}'
-            RepositoryType: 'GitHub'
-            VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-            FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-            InformationalVersion: '$(SemanticVersion)'
-            PackageVersion: '$(SemanticVersion)'
-            LogLevel: 'verbose'
-            FailOnWarning: false
-            DisableTelemetry: false
+      steps:
+      - task: Assembly-Info-NetCore@2
+        displayName: 'Set Assembly Info'
+        inputs:
+          Path: '$(Build.SourcesDirectory)'
+          FileNames: '${{parameters.targetProject}}'
+          InsertAttributes: true
+          FileEncoding: 'auto'
+          WriteBOM: false
+          PackageRequireLicenseAcceptance: true
+          PackageId: 'ProphetsWay.${{parameters.libraryName}}'
+          Authors: 'G. Gordon Nasseri'
+          Company: 'ProphetsWay'
+          Product: '${{parameters.libraryName}}'
+          Description: '${{parameters.description}}'
+          PackageLicenseUrl: '${{parameters.licenseUrl}}'
+          RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.${{parameters.libraryName}}'
+          RepositoryType: 'GitHub'
+          VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+          FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
+          InformationalVersion: '$(SemanticVersion)'
+          PackageVersion: '$(SemanticVersion)'
+          LogLevel: 'verbose'
+          FailOnWarning: false
+          DisableTelemetry: false
 
-        - template: build-and-test.yml
-          parameters:
-            vmImage: ${{parameters.vmImage}}
+      - template: build-and-test.yml
+        parameters:
+          vmImage: ${{parameters.vmImage}}
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Alpha NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: '${{parameters.targetProject}}'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'AlphaVersion'
+      - task: DotNetCoreCLI@2
+        displayName: 'Assemble Alpha NuGet Package'
+        inputs:
+          command: 'pack'
+          packagesToPack: '${{parameters.targetProject}}'
+          packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: 'AlphaVersion'
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Beta NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: '${{parameters.targetProject}}'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'BetaVersion'
+      - task: DotNetCoreCLI@2
+        displayName: 'Assemble Beta NuGet Package'
+        inputs:
+          command: 'pack'
+          packagesToPack: '${{parameters.targetProject}}'
+          packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: 'BetaVersion'
 
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Release NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: '${{parameters.targetProject}}'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\release'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'SemanticVersion'
+      - task: DotNetCoreCLI@2
+        displayName: 'Assemble Release NuGet Package'
+        inputs:
+          command: 'pack'
+          packagesToPack: '${{parameters.targetProject}}'
+          packDirectory: '$(Build.ArtifactStagingDirectory)\release'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: 'SemanticVersion'
 
-        - task: CopyFiles@2
-          displayName: 'Copy Changelog to Staging'
-          inputs:
-            Contents: 'CHANGELOG.md'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)\'
+      - task: CopyFiles@2
+        displayName: 'Copy Changelog to Staging'
+        inputs:
+          Contents: 'CHANGELOG.md'
+          TargetFolder: '$(Build.ArtifactStagingDirectory)\'
 
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifacts'
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
+      - task: PublishBuildArtifacts@1
+        displayName: 'Publish Artifacts'
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
 
   - stage: DeployAlpha
     displayName: Deploy Alpha NuGet Package
