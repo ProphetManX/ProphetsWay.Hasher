@@ -5,6 +5,11 @@
 
 trigger:
 - master
+pr:
+  branches:
+    include:
+    - '*'
+
 
 variables:
   MajorVersion: '1'
@@ -14,7 +19,7 @@ variables:
 
 
 
-stages:
+  stages:
 - template: build-test-deploy-release.yml
   parameters:
     vmImage: 'windows-latest'

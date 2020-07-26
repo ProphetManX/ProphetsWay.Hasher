@@ -9,15 +9,14 @@ parameters:
   licenseUrl: 'NO_DEFAULT'
   description: 'NO_DEFAULT'
 
-variables:
-  SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
-  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
-  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
-
 
 stages:
   - stage: Build
     displayName: Build Stage
+    variables:
+      SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
+      AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
+      BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
     jobs:
     - job: Build
       displayName: Build
@@ -27,6 +26,7 @@ stages:
         steps:
         - task: Assembly-Info-NetCore@2
           displayName: 'Set Assembly Info'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             Path: '$(Build.SourcesDirectory)'
             FileNames: '${{parameters.targetProject}}'
@@ -56,6 +56,7 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Alpha NuGet Package'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -65,6 +66,7 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Beta NuGet Package'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -74,6 +76,7 @@ stages:
 
         - task: DotNetCoreCLI@2
           displayName: 'Assemble Release NuGet Package'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             command: 'pack'
             packagesToPack: '${{parameters.targetProject}}'
@@ -83,12 +86,14 @@ stages:
 
         - task: CopyFiles@2
           displayName: 'Copy Changelog to Staging'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             Contents: 'CHANGELOG.md'
             TargetFolder: '$(Build.ArtifactStagingDirectory)\'
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Artifacts'
+          condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
             ArtifactName: 'drop'
@@ -97,6 +102,7 @@ stages:
   - stage: DeployAlpha
     displayName: Deploy Alpha NuGet Package
     dependsOn: Build
+    condition: and(eq(variables['Build.SourceBranch'], 'refs/head/master'))
     jobs:
     - job: DeployAlpha
       displayName: 'Deploy Alpha NuGet Package Job'
