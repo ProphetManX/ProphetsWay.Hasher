@@ -34,14 +34,11 @@ stages:
       BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
     jobs:
     - job: Build
-      displayName: Build
+      displayName: CI Build
       pool:
         vmImage: ${{parameters.vmImage}}
 
         steps:
-        - script: echo Hello World blarg
-        - script: echo variables['Build.SourceBranch']
-        
         - task: Assembly-Info-NetCore@2
           displayName: 'Set Assembly Info'
           inputs:
