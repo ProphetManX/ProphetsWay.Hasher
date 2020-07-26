@@ -24,6 +24,8 @@ stages:
         vmImage: ${{parameters.vmImage}}
 
         steps:
+        - script: echo variables['Build.SourceBranch']
+        
         - task: Assembly-Info-NetCore@2
           displayName: 'Set Assembly Info'
           condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/head/master'))
