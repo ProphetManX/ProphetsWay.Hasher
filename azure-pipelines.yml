@@ -131,6 +131,6 @@ stages:
         displayName: 'Push Alpha NuGet Package'
         inputs:
           command: 'push'
-          packagesToPush: '$(System.DefaultWorkingDirectory)/Build/drop/alpha/*.nupkg'
+          packagesToPush: '$(build.artifactstagingdirectory)/drop/alpha/*.nupkg'
           nuGetFeedType: 'external'
           publishFeedCredentials: 'ProphetManX''s NuGet'
