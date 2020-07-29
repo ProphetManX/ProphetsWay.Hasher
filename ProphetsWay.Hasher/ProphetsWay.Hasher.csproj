@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net451;net452;net46;net461;net471;netstandard2.0;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;</TargetFrameworks>
+    <TargetFrameworks>net451;net452;net46;net461;net471;netstandard2.0;netstandard2.1;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1;net48;</TargetFrameworks>
     <RootNamespace>ProphetsWay.Utilities</RootNamespace>
     <AssemblyName>ProphetsWay.Hasher</AssemblyName>
     <ApplicationIcon />
@@ -20,9 +20,7 @@
       To Use:
       add "using ProphetsWay.Utilities;" to your class
 
-      and then you can call the Logger directly.
-      Logger.AddDestination(new ConsoleDestination());
-      Logger.Debug("Hello World!");
+      
     </Description>
     
     <!-- Assembly Override Properties -->
@@ -47,10 +45,6 @@
     <InformationalVersion />
 
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="ProphetsWay.Logger" Version="1.2.0" />
-  </ItemGroup>
 
 
 </Project>
