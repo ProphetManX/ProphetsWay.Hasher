@@ -9,6 +9,10 @@ parameters:
   licenseUrl: 'NO_DEFAULT'
   description: 'NO_DEFAULT'
 
+variables:
+  SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
+  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
+  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
 
 stages:
   - stage: PullRequest
@@ -28,10 +32,7 @@ stages:
   - stage: Build
     displayName: Build Stage
     condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
-    variables:
-      SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
-      AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
-      BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
+
     jobs:
     - job: CiBuild
       displayName: CI Build
