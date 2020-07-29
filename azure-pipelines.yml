@@ -5,51 +5,26 @@
 
 trigger:
 - master
+pr:
+  branches:
+    include:
+    - '*'
 
-pool:
-  vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+  MajorVersion: '1'
+  MinorVersion: '0'
+  PatchVersion: '0'
 
-steps:
-- task: Assembly-Info-NetCore@2
-  inputs:
-    Path: '$(Build.SourcesDirectory)'
-    FileNames: '**/ProphetsWay.Hasher.csproj'
-    InsertAttributes: true
-    FileEncoding: 'auto'
-    WriteBOM: false
-    PackageRequireLicenseAcceptance: true
-    PackageId: 'ProphetsWay.Hasher'
-    Authors: 'G. Gordon Nasseri'
-    Company: 'ProphetsWay'
-    Product: 'Hasher'
-    Description: 'Simple hashing library to make it easier to generate file checksums.'
-    RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
-    RepositoryType: 'GitHub'
-    VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-    FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-    InformationalVersion: '$(SemanticVersion)'
-    PackageVersion: '$(SemanticVersion)'
-    LogLevel: 'verbose'
-    FailOnWarning: false
-    DisableTelemetry: false
-- task: NuGetToolInstaller@1
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+stages:
+- template: build-test-deploy-release.yml
+  parameters:
+    vmImage: 'windows-latest'
+    repositoryName: 'ProphetManX/ProphetsWay.Hasher'
+    targetProject: '**/ProphetsWay.Hasher.csproj'
+    libraryName: 'Hasher'
+    licenseUrl: 'https://opensource.org/licenses/MIT'
+    description: 'Simple hashing library to make it easier to generate file checksums.'
+    
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
