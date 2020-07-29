@@ -15,6 +15,9 @@ variables:
   MajorVersion: '1'
   MinorVersion: '0'
   PatchVersion: '0'
+  SemanticVersion: '$(MajorVersion).$(MinorVersion).$(PatchVersion)'
+  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
+  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
 
 
 
@@ -25,9 +28,6 @@ stages:
     vmImage: 'windows-latest'
     repositoryName: 'ProphetManX/ProphetsWay.Hasher'
     targetProject: '**/ProphetsWay.Hasher.csproj'
-    majorVersion: $(MajorVersion)
-    minorVersion: $(MinorVersion)
-    patchVersion: $(PatchVersion)
     libraryName: 'Hasher'
     licenseUrl: 'https://opensource.org/licenses/MIT'
     description: 'Simple hashing library to make it easier to generate file checksums.'

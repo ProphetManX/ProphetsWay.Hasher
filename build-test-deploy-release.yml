@@ -2,17 +2,9 @@ parameters:
   vmImage: 'windows-latest'
   repositoryName: 'NO_DEFAULT'
   targetProject: 'NO_DEFAULT'
-  majorVersion: '0'
-  minorVersion: '0'
-  patchVersion: '0'
   libraryName: 'NO_DEFAULT'
   licenseUrl: 'NO_DEFAULT'
   description: 'NO_DEFAULT'
-
-variables:
-  SemanticVersion: '${{parameters.majorVersion}}.${{parameters.minorVersion}}.${{parameters.patchVersion}}'
-  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
-  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
 
 stages:
   - stage: PullRequest
