@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace ProphetsWay.Utilities
@@ -14,46 +15,65 @@ namespace ProphetsWay.Utilities
 			return BitConverter.ToString(bytes).Replace("-", "").ToLower();
 		}
 
+		internal static void GenerateIncrementalHash(this HashAlgorithm hasher, byte[] inputBuffer, int bufferLength)
+		{
+			if (bufferLength > 0)
+				hasher.TransformBlock(inputBuffer, 0, bufferLength, inputBuffer, 0);
+			else
+				hasher.TransformFinalBlock(inputBuffer, 0, bufferLength);
+		}
+
+		/// <summary>
+		/// Reads the stream and returns a Checksum calculated with the requested HashType
+		/// </summary>
+		/// <param name="hashType">The Algorithm used to calculate the checksum.</param>
+		/// <returns>A lowercase string representing the checksum.</returns>
 		public static string GenerateHash(this Stream stream, HashTypes hashType)
 		{
-			var worker = new HashWorker(hashType);
-			worker.GenerateHash(stream);
-			return worker.Hash.ToLowerString();
+			var hasher = hashType.GetHasher();
+			hasher.ComputeHash(stream);
+			return hasher.Hash.ToLowerString();
 		}
 
+		/// <summary>
+		/// Reads the stream and returns true/false if your expected checksum matches.
+		/// </summary>
+		/// <param name="hash">Your expected checksum.</param>
+		/// <param name="hashType">The Algorithm used to calculate the checksum.</param>
 		public static bool VerifyHash(this Stream stream, string hash, HashTypes hashType)
 		{
-			return string.Equals(hash, GenerateHash(stream, hashType), StringComparison.OrdinalIgnoreCase);
+			return GenerateHash(stream, hashType).Equals(hash, StringComparison.OrdinalIgnoreCase);
 		}
 
+		/// <summary>
+		/// Opens the FileInfo and returns true/false if your expected checksum matches.
+		/// </summary>
+		/// <param name="hash">Your expected checksum.</param>
+		/// <param name="hashType">The Algorithm used to calculate the checksum.</param>
 		public static bool VerifyHash(this FileInfo fileInfo, string hash, HashTypes hashType)
 		{
 			return VerifyHash(fileInfo.OpenRead(), hash, hashType);
 		}
 
-		public static string GenerateHash(string fileName, HashTypes hashType)
-		{
-			return GenerateHash(new FileInfo(fileName), hashType);
-		}
-
+		/// <summary>
+		/// Opens the FileInfo and returns a Checksum calculated with the requested HashType
+		/// </summary>
+		/// <param name="hashType">The Algorithm used to calculate the checksum.</param>
+		/// <returns>A lowercase string representing the checksum.</returns>
 		public static string GenerateHash(this FileInfo fileInfo, HashTypes hashType)
 		{
 			return GenerateHash(fileInfo.OpenRead(), hashType);
 		}
 
-		[Obsolete("This method is deprecated.  Switch to using GenerateHashes(Stream, HashTypes) instead.")]
-		public static HashCollection GenerateHashes(this Stream stream)
+		/// <summary>
+		/// Opens a file specified by FileName and returns a Checksum calculated with the requested HashType
+		/// </summary>
+		/// <param name="hashType">The Algorithm used to calculate the checksum.</param>
+		/// <param name="fileName">The path of your file to be hashed.</param>
+		/// <returns>A lowercase string representing the checksum.</returns>
+		public static string GenerateHash(string fileName, HashTypes hashType)
 		{
-			var task = Task.Run(() => { return GenerateHashesAsync(stream); });
-			task.Wait();
-			return task.Result;
-		}
-
-		public static Dictionary<HashTypes, string> GenerateHashes(this Stream stream, HashTypes hashtypes)
-		{
-			var task = Task.Run(() => { return GenerateHashesAsync(stream, hashtypes); });
-			task.Wait();
-			return task.Result;	
+			return GenerateHash(new FileInfo(fileName), hashType);
 		}
 
 		private async static Task<Dictionary<HashTypes, byte[]>> GenerateHashesAsBytes(Stream stream, HashTypes hashtypes)
@@ -84,6 +104,11 @@ namespace ProphetsWay.Utilities
 			return rslt;
 		}
 
+		/// <summary>
+		/// Reads a stream and returns a Dictionary with all the requested HashTypes and its associated checksum.
+		/// </summary>
+		/// <param name="hashtypes">The Algorithm(s) requested to generate checksums.  You can select multiple HashTypes by using bitwise "or" operations '|'</param>
+		/// <returns>A dictionary with enum HashType as the key, and the lowercase string checksum as its value.</returns>
 		public async static Task<Dictionary<HashTypes, string>> GenerateHashesAsync(this Stream stream, HashTypes hashtypes)
 		{
 			var byteResults = await GenerateHashesAsBytes(stream, hashtypes);
@@ -93,6 +118,18 @@ namespace ProphetsWay.Utilities
 				rslt.Add(br.Key, br.Value.ToLowerString());
 
 			return rslt;
+		}
+
+		/// <summary>
+		/// Reads a stream and returns a Dictionary with all the requested HashTypes and its associated checksum.
+		/// </summary>
+		/// <param name="hashtypes">The Algorithm(s) requested to generate checksums.  You can select multiple HashTypes by using bitwise "or" operations '|'</param>
+		/// <returns>A dictionary with enum HashType as the key, and the lowercase string checksum as its value.</returns>
+		public static Dictionary<HashTypes, string> GenerateHashes(this Stream stream, HashTypes hashtypes)
+		{
+			var task = Task.Run(() => { return GenerateHashesAsync(stream, hashtypes); });
+			task.Wait();
+			return task.Result;
 		}
 
 		[Obsolete("This method is deprecated.  Switch to using GenerateHashesAsync(Stream, HashTypes) instead.")]
@@ -106,6 +143,14 @@ namespace ProphetsWay.Utilities
 			return ret;
 		}
 
-		
+		[Obsolete("This method is deprecated.  Switch to using GenerateHashes(Stream, HashTypes) instead.")]
+		public static HashCollection GenerateHashes(this Stream stream)
+		{
+			var task = Task.Run(() => { return GenerateHashesAsync(stream); });
+			task.Wait();
+			return task.Result;
+		}
+
+
 	}
 }
