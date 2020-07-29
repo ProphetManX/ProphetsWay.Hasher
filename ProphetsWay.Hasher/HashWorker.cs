@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -16,28 +15,7 @@ namespace ProphetsWay.Utilities
         public HashWorker(HashTypes hashType)
         {
             _hashType = hashType;
-
-            switch (_hashType)
-            {
-                case HashTypes.MD5:
-                    Hasher = new MD5CryptoServiceProvider();
-                    break;
-
-                case HashTypes.SHA1:
-                    Hasher = new SHA1Managed();
-                    break;
-
-                case HashTypes.SHA256:
-                    Hasher = new SHA256Managed();
-                    break;
-
-                case HashTypes.SHA512:
-                    Hasher = new SHA512Managed();
-                    break;
-
-                default:
-                    throw new InvalidEnumArgumentException("Improper value of HashType was used.");
-            }
+            Hasher = hashType.GetHasher();
         }
 
         public void GenerateHash(Stream stream)
