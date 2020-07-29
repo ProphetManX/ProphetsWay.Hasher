@@ -162,7 +162,7 @@ stages:
               displayName: 'Create GitHub Beta Release'
               inputs:
                 gitHubConnection: 'ProphetsWay@GitHub'
-                repositoryName: '{{parameters.repositoryName}}'
+                repositoryName: '${{parameters.repositoryName}}'
                 action: 'create'
                 target: '$(Build.SourceVersion)'
                 tagSource: 'userSpecifiedTag'
@@ -217,7 +217,7 @@ stages:
               displayName: 'Create GitHub Release'
               inputs:
                 gitHubConnection: 'ProphetsWay@GitHub'
-                repositoryName: '{{parameters.repositoryName}}'
+                repositoryName: '${{parameters.repositoryName}}'
                 action: 'create'
                 target: '$(Build.SourceVersion)'
                 tagSource: 'userSpecifiedTag'

@@ -5,219 +5,31 @@
 
 trigger:
 - master
+pr:
+  branches:
+    include:
+    - '*'
+
 
 variables:
   MajorVersion: '1'
   MinorVersion: '0'
   PatchVersion: '0'
-  SemanticVersion: '$(MajorVersion).$(MinorVersion).$(PatchVersion)'
-  AlphaVersion: '$(SemanticVersion)-$(Build.BuildId).Alpha'
-  BetaVersion: '$(SemanticVersion)-$(Build.BuildId).Beta'
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  vmImage: 'windows-latest'
+
+
+
 
 stages:
-  - stage: Build
-    displayName: Build Stage
-    jobs:
-      - job: Build
-        displayName: Build
-        pool:
-          vmImage: $(vmImage)
+- template: build-test-deploy-release.yml
+  parameters:
+    vmImage: 'windows-latest'
+    repositoryName: 'ProphetManX/ProphetsWay.Hasher'
+    targetProject: '**/ProphetsWay.Hasher.csproj'
+    majorVersion: $(MajorVersion)
+    minorVersion: $(MinorVersion)
+    patchVersion: $(PatchVersion)
+    libraryName: 'Hasher'
+    licenseUrl: 'https://opensource.org/licenses/MIT'
+    description: 'Simple hashing library to make it easier to generate file checksums.'
+    
 
-        steps:
-        - task: Assembly-Info-NetCore@2
-          displayName: 'Set Assembly Info'
-          inputs:
-            Path: '$(Build.SourcesDirectory)'
-            FileNames: '**/ProphetsWay.Hasher.csproj'
-            InsertAttributes: true
-            FileEncoding: 'auto'
-            WriteBOM: false
-            PackageRequireLicenseAcceptance: true
-            PackageId: 'ProphetsWay.Hasher'
-            Authors: 'G. Gordon Nasseri'
-            Company: 'ProphetsWay'
-            Product: 'Hasher'
-            Description: 'Simple hashing library to make it easier to generate file checksums.'
-            PackageLicenseUrl: 'https://opensource.org/licenses/MIT'
-            RepositoryUrl: 'https://github.com/ProphetManX/ProphetsWay.Hasher'
-            RepositoryType: 'GitHub'
-            VersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-            FileVersionNumber: '$(SemanticVersion).$(Build.BuildId)'
-            InformationalVersion: '$(SemanticVersion)'
-            PackageVersion: '$(SemanticVersion)'
-            LogLevel: 'verbose'
-            FailOnWarning: false
-            DisableTelemetry: false
-
-        - template: build-and-test.yml
-          parameters:
-            vmImage: $(vmImage)
-
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Alpha NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\alpha'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'AlphaVersion'
-
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Beta NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\beta'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'BetaVersion'
-
-        - task: DotNetCoreCLI@2
-          displayName: 'Assemble Release NuGet Package'
-          inputs:
-            command: 'pack'
-            packagesToPack: 'ProphetsWay.Hasher/ProphetsWay.Hasher.csproj'
-            packDirectory: '$(Build.ArtifactStagingDirectory)\release'
-            versioningScheme: 'byEnvVar'
-            versionEnvVar: 'SemanticVersion'
-
-        - task: CopyFiles@2
-          displayName: 'Copy Changelog to Staging'
-          inputs:
-            Contents: 'CHANGELOG.md'
-            TargetFolder: '$(Build.ArtifactStagingDirectory)\'
-
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Artifacts'
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-            ArtifactName: 'drop'
-            publishLocation: 'Container'
-
-  - stage: DeployAlpha
-    displayName: Deploy Alpha NuGet Package
-    dependsOn: Build
-    jobs:
-    - job: DeployAlpha
-      displayName: 'Deploy Alpha NuGet Package Job'
-      continueOnError: "true"
-      pool:
-        vmImage: $(vmImage)
-      steps:
-      - task: DownloadBuildArtifacts@0
-        displayName: Download Artifact
-        inputs:
-          buildType: 'current'
-          downloadType: 'single'
-          artifactName: 'drop'
-          downloadPath: '$(build.artifactstagingdirectory)'
-
-      - task: NuGetCommand@2
-        displayName: 'Push Alpha NuGet Package'
-        inputs:
-          command: 'push'
-          packagesToPush: '$(build.artifactstagingdirectory)/drop/alpha/*.nupkg'
-          nuGetFeedType: 'external'
-          publishFeedCredentials: 'ProphetManX''s NuGet'
-
-  - stage: DeployBeta
-    displayName: Deploy Beta NuGet Package
-    dependsOn: DeployAlpha
-    jobs:
-    - deployment: DeployBeta
-      displayName: 'Deploy Beta NuGet Package Job'
-      continueOnError: "false"
-      pool:
-        vmImage: $(vmImage)
-      environment: 'Hasher Beta NuGet'
-      strategy: 
-        runOnce:
-          deploy:
-            steps:
-            - task: DownloadBuildArtifacts@0
-              displayName: Download Artifact
-              inputs:
-                buildType: 'current'
-                downloadType: 'single'
-                artifactName: 'drop'
-                downloadPath: '$(build.artifactstagingdirectory)'
-
-            - task: GitHubRelease@1
-              displayName: 'Create GitHub Beta Release'
-              inputs:
-                gitHubConnection: 'ProphetsWay@GitHub'
-                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
-                action: 'create'
-                target: '$(Build.SourceVersion)'
-                tagSource: 'userSpecifiedTag'
-                tag: '$(BetaVersion)'
-                title: '$(BetaVersion)'
-                releaseNotesFilePath: '$(build.artifactstagingdirectory)/drop/changelog.md'
-                assets: '$(build.artifactstagingdirectory)/drop/beta/*.nupkg'
-                isPreRelease: true
-                changeLogCompareToRelease: 'lastFullRelease'
-                changeLogType: 'commitBased'
-
-            - task: NuGetCommand@2
-              displayName: 'Push Beta NuGet Package'
-              inputs:
-                command: 'push'
-                packagesToPush: '$(build.artifactstagingdirectory)/drop/beta/*.nupkg'
-                nuGetFeedType: 'external'
-                publishFeedCredentials: 'ProphetManX''s NuGet'
-
-  - stage: DeployRelease
-    displayName: Deploy Release NuGet Package
-    dependsOn: DeployBeta
-    jobs:
-    - deployment: DeployRelease
-      displayName: 'Deploy Release NuGet Package Job'
-      continueOnError: "false"
-      pool:
-        vmImage: $(vmImage)
-      environment: 'Hasher Release NuGet'
-      strategy: 
-        runOnce:
-          deploy:
-            steps:
-            - task: DownloadBuildArtifacts@0
-              displayName: Download Artifact
-              inputs:
-                buildType: 'current'
-                downloadType: 'single'
-                artifactName: 'drop'
-                downloadPath: '$(build.artifactstagingdirectory)'
-
-            - task: GitHubRelease@1
-              displayName: 'Delete GitHub Beta Release'
-              inputs:
-                gitHubConnection: 'ProphetsWay@GitHub'
-                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
-                action: 'delete'
-                tag: '$(BetaVersion)'
-
-            - task: GitHubRelease@1
-              displayName: 'Create GitHub Release'
-              inputs:
-                gitHubConnection: 'ProphetsWay@GitHub'
-                repositoryName: 'ProphetManX/ProphetsWay.Hasher'
-                action: 'create'
-                target: '$(Build.SourceVersion)'
-                tagSource: 'userSpecifiedTag'
-                tag: '$(SemanticVersion)'
-                title: '$(SemanticVersion)'
-                releaseNotesFilePath: '$(build.artifactstagingdirectory)/drop/changelog.md'
-                assets: '$(build.artifactstagingdirectory)/drop/release/*.nupkg'
-                changeLogCompareToRelease: 'lastFullRelease'
-                changeLogType: 'commitBased'
-
-            - task: NuGetCommand@2
-              displayName: 'Push Release NuGet Package'
-              inputs:
-                command: 'push'
-                packagesToPush: '$(build.artifactstagingdirectory)/drop/release/*.nupkg'
-                nuGetFeedType: 'external'
-                publishFeedCredentials: 'ProphetManX''s NuGet'
