@@ -24,6 +24,8 @@ stages:
   - stage: Build
     displayName: Build Stage
     condition: contains(variables['build.sourceBranch'], 'refs/heads/master')
+    variables:
+    - template: version-variables.yml
 
     jobs:
     - job: CiBuild
@@ -132,6 +134,9 @@ stages:
     displayName: Deploy Beta NuGet Package
     dependsOn: DeployAlpha
     condition: and(succeeded('DeployAlpha'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    variables:
+    - template: version-variables.yml
+
     jobs:
     - deployment: DeployBeta
       displayName: 'Deploy Beta NuGet Package Job'
@@ -179,6 +184,9 @@ stages:
     displayName: Deploy Release NuGet Package
     dependsOn: DeployBeta
     condition: and(succeeded('DeployBeta'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    variables:
+    - template: version-variables.yml
+
     jobs:
     - deployment: DeployRelease
       displayName: 'Deploy Release NuGet Package Job'

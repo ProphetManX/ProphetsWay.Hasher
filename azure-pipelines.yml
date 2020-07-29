@@ -15,7 +15,6 @@ variables:
   MajorVersion: '1'
   MinorVersion: '0'
   PatchVersion: '0'
-- template: version-variables.yml
 
 
 stages:
