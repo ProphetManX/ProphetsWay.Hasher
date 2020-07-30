@@ -45,6 +45,50 @@ namespace ProphetsWay.Utilities
 			return GenerateHash(stream, hashType).Equals(hash, StringComparison.OrdinalIgnoreCase);
 		}
 
+		private static HashTypes GetHashTypeByStringLength(string hash)
+		{
+			switch (hash.Length)
+			{
+				case 32:
+					return HashTypes.MD5;
+
+				case 40:
+					var hashType = HashTypes.SHA1;
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+					hashType |= HashTypes.RIPEMD160;
+#endif
+					return hashType;
+
+				case 64:
+					return HashTypes.SHA256;
+
+				case 96:
+					return HashTypes.SHA384;
+
+				case 128:
+					return HashTypes.SHA512;
+
+				default:
+					throw new Exception("Unable to identify hash algorithm by length of providied checksum.");
+			}
+		}
+
+		/// <summary>
+		/// Reads the stream and returns true/false if your expected checksum matches.
+		/// </summary>
+		/// <param name="hash">Your expected checksum, length will be parsed to identify which algorithm is used.</param>
+		public static bool VerifyHash(this Stream stream, string hash)
+		{
+			var hashTypes = GetHashTypeByStringLength(hash);
+			var hashes = stream.GenerateHashes(hashTypes);
+
+			foreach (var result in hashes)
+				if (result.Value.Equals(hash, StringComparison.OrdinalIgnoreCase))
+					return true;
+
+			return false;
+		}
+
 		/// <summary>
 		/// Opens the FileInfo and returns true/false if your expected checksum matches.
 		/// </summary>
