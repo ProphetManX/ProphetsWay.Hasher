@@ -1,5 +1,4 @@
 ﻿using Xunit;
-using ProphetsWay.Utilities;
 using FluentAssertions;
 using System.Security.Cryptography;
 using System;

@@ -4,7 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace ProphetsWay.Utilities
+namespace ProphetsWay.Hasher
 {
 	public static class Hasher
 	{

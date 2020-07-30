@@ -1,6 +1,5 @@
 using System.IO;
 using Xunit;
-using ProphetsWay.Utilities;
 using FluentAssertions;
 using System.Collections.Generic;
 
@@ -147,7 +146,7 @@ namespace ProphetsWay.Hasher.Tests
 #endif
 		public void TestGenerateHashFromFileName(string filename, string expectedHash, HashTypes hashType)
 		{
-			var hashResult = Utilities.Hasher.GenerateHash(filename, hashType);
+			var hashResult = Hasher.GenerateHash(filename, hashType);
 
 			hashResult.Should().Be(expectedHash);
 		}

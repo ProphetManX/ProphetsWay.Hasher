@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Security.Cryptography;
 
-namespace ProphetsWay.Utilities
+namespace ProphetsWay.Hasher
 {
 	public static class HashFactory
 	{

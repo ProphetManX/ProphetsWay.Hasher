@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net451;net452;net46;net461;net471;netstandard2.0;netstandard2.1;netcoreapp2.2;netcoreapp2.1;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1;net48;</TargetFrameworks>
-    <RootNamespace>ProphetsWay.Utilities</RootNamespace>
+    <RootNamespace>ProphetsWay.Hasher</RootNamespace>
     <AssemblyName>ProphetsWay.Hasher</AssemblyName>
     <ApplicationIcon />
     <Win32Resource />
@@ -11,14 +11,9 @@
     <Authors>G. Gordon Nasseri</Authors>
     <Company>ProphetsWay</Company>
     <Description>
-      A simple and easy to use Logging library that allows for customizable outputs for log entries.
+A simple library to assist with generating Hash/Checksums against files/streams.
 
-      Go to https://github.com/ProphetManX/ProphetsWay.Hasher for more information.
-
-      Just one of a few Utility projects I've created for myself and wanted to share.  The namespace for the projects are all "ProphetsWay.Utilities" and the class to use is "Hasher".
-
-      To Use:
-      add "using ProphetsWay.Utilities;" to your class
+Go to https://github.com/ProphetManX/ProphetsWay.Hasher for more information.
 
       
     </Description>
