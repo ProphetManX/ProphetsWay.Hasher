@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Security.Cryptography;
 
 namespace ProphetsWay.Utilities
@@ -31,6 +33,18 @@ namespace ProphetsWay.Utilities
 				default:
 					throw new InvalidEnumArgumentException("Improper/unknown value of HashType was used.");
 			}
+		}
+
+		public static Dictionary<HashTypes, HashAlgorithm> GetHashers(this HashTypes hashTypes)
+		{
+			var hashers = new Dictionary<HashTypes, HashAlgorithm>();
+
+			var types = Enum.GetValues(hashTypes.GetType());
+			foreach(HashTypes type in types)
+				if((hashTypes & type) == type)
+					hashers.Add(type, type.GetHasher());
+
+			return hashers;
 		}
 	}
 }

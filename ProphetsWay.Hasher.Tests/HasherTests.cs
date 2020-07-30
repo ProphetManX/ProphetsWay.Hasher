@@ -2,6 +2,7 @@ using System.IO;
 using Xunit;
 using ProphetsWay.Utilities;
 using FluentAssertions;
+using System.Collections.Generic;
 
 namespace ProphetsWay.Hasher.Tests
 {
@@ -43,7 +44,7 @@ namespace ProphetsWay.Hasher.Tests
 			hashResult.Should().Be(expectedHash);
 		}
 
-		[Theory]		
+		[Theory]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.MD5, HashTypes.MD5, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA1, HashTypes.SHA1, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256, true)]
@@ -154,14 +155,20 @@ namespace ProphetsWay.Hasher.Tests
 			hashResult.Should().Be(expectedHash);
 		}
 
+		private Stream GetFileStream(string filename)
+		{
+			var fi = new FileInfo(filename);
+			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			return fs;
+		}
+
 		[Theory]
 		[InlineData(TestFiles.TestFileA.Name, TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256, TestFiles.TestFileA.SHA512)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.MD5, TestFiles.TestFileB.SHA1, TestFiles.TestFileB.SHA256, TestFiles.TestFileB.SHA512)]
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.MD5, TestFiles.TestFileC.SHA1, TestFiles.TestFileC.SHA256, TestFiles.TestFileC.SHA512)]
 		public async void TestGenerateHashesAsyncFromStream(string filename, string expectedMD5, string expectedSHA1, string expectedSHA256, string expectedSHA512)
 		{
-			var fi = new FileInfo(filename);
-			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			var fs = GetFileStream(filename);
 
 			var hashResult = await fs.GenerateHashesAsync();
 
@@ -177,8 +184,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.MD5, TestFiles.TestFileC.SHA1, TestFiles.TestFileC.SHA256, TestFiles.TestFileC.SHA512)]
 		public void TestGenerateHashesFromStream(string filename, string expectedMD5, string expectedSHA1, string expectedSHA256, string expectedSHA512)
 		{
-			var fi = new FileInfo(filename);
-			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			var fs = GetFileStream(filename);
 
 			var hashResult = fs.GenerateHashes();
 
@@ -186,6 +192,51 @@ namespace ProphetsWay.Hasher.Tests
 			hashResult.SHA1.Should().Be(expectedSHA1);
 			hashResult.SHA256.Should().Be(expectedSHA256);
 			hashResult.SHA512.Should().Be(expectedSHA512);
+		}
+
+		private HashTypes GetRolledUpHashTypes(HashTypes[] hashTypes)
+		{
+			HashTypes requestedHashes = 0;
+			foreach (var ht in hashTypes)
+				requestedHashes = requestedHashes | ht;
+
+			return requestedHashes;
+		}
+
+		private void VerifyArraysMatch(Dictionary<HashTypes, string> results, HashTypes[] hashTypes, string[] expectedHashes)
+		{
+			for (var i = 0; i < expectedHashes.Length; i++)
+				results[hashTypes[i]].Should().Be(expectedHashes[i]);
+		}
+
+		[Theory]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[2] { HashTypes.MD5, HashTypes.SHA1 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[3] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[4] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256, HashTypes.SHA384 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256, TestFiles.TestFileA.SHA384 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[5] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256, HashTypes.SHA384, HashTypes.SHA512 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256, TestFiles.TestFileA.SHA384, TestFiles.TestFileA.SHA512 })]
+		public async void TestDynamicGenerateHashesAsyncFromStream(string filename, HashTypes[] hashTypes, string[] expectedHashes)
+		{
+			var fs = GetFileStream(filename);
+			var requestedHashes = GetRolledUpHashTypes(hashTypes);
+
+			var hashes = await fs.GenerateHashesAsync(requestedHashes);
+
+			VerifyArraysMatch(hashes, hashTypes, expectedHashes);
+		}
+
+		[Theory]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[2] { HashTypes.MD5, HashTypes.SHA1 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[3] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[4] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256, HashTypes.SHA384 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256, TestFiles.TestFileA.SHA384 })]
+		[InlineData(TestFiles.TestFileA.Name, new HashTypes[5] { HashTypes.MD5, HashTypes.SHA1, HashTypes.SHA256, HashTypes.SHA384, HashTypes.SHA512 }, new string[] { TestFiles.TestFileA.MD5, TestFiles.TestFileA.SHA1, TestFiles.TestFileA.SHA256, TestFiles.TestFileA.SHA384, TestFiles.TestFileA.SHA512 })]
+		public void TestDynamicGenerateHashesFromStream(string filename, HashTypes[] hashTypes, string[] expectedHashes)
+		{
+			var fs = GetFileStream(filename);
+			var requestedHashes = GetRolledUpHashTypes(hashTypes);
+
+			var hashes = fs.GenerateHashes(requestedHashes);
+
+			VerifyArraysMatch(hashes, hashTypes, expectedHashes);
 		}
 	}
 }
