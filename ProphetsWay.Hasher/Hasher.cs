@@ -175,26 +175,5 @@ namespace ProphetsWay.Utilities
 			task.Wait();
 			return task.Result;
 		}
-
-		[Obsolete("This method is deprecated.  Switch to using GenerateHashesAsync(Stream, HashTypes) instead.")]
-		public async static Task<HashCollection> GenerateHashesAsync(this Stream stream)
-		{
-			var hashes = HashTypes.MD5 | HashTypes.SHA1 | HashTypes.SHA256 | HashTypes.SHA512;
-
-			var results = await GenerateHashesAsBytes(stream, hashes);
-
-			var ret = new HashCollection(results[HashTypes.MD5], results[HashTypes.SHA1], results[HashTypes.SHA256], results[HashTypes.SHA512]);
-			return ret;
-		}
-
-		[Obsolete("This method is deprecated.  Switch to using GenerateHashes(Stream, HashTypes) instead.")]
-		public static HashCollection GenerateHashes(this Stream stream)
-		{
-			var task = Task.Run(() => { return GenerateHashesAsync(stream); });
-			task.Wait();
-			return task.Result;
-		}
-
-
 	}
 }
