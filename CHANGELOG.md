@@ -1,3 +1,10 @@
+# v2.0.0
+### Code Cleanup
+- Changed the namespace from ```ProphetsWay.Utilities``` to the appropriate ```ProphetsWay.Hasher``` 
+  - This was an artifact from when the code was broken out of a single project with many smaller modules.
+- Removed the depricated method calls.
+
+
 # v1.1.0
 ### Added Algorithms
 - Added support for Hashing Algorithms SHA384 and RIPEMD160.  You can now specify them using the HashTypes enum.

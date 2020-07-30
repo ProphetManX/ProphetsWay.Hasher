@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ProphetsWay.Utilities
+namespace ProphetsWay.Hasher
 {
 	[Flags]
 	public enum HashTypes
