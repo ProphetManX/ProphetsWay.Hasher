@@ -36,8 +36,7 @@ namespace ProphetsWay.Hasher.Tests
 		/// </summary>
 		public void TestGenerateHashFromStream(string filename, string expectedHash, HashTypes hashType)
 		{
-			var fi = new FileInfo(filename);
-			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			var fs = GetFileStream(filename);
 
 			var hashResult = fs.GenerateHash(hashType);
 
@@ -55,8 +54,7 @@ namespace ProphetsWay.Hasher.Tests
 #endif
 		public void TestVerifyHashFromStream(string filename, string expectedHash, HashTypes hashType, bool expectedOutcome)
 		{
-			var fi = new FileInfo(filename);
-			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			var fs = GetFileStream(filename);
 
 			var hashResult = fs.VerifyHash(expectedHash, hashType);
 
@@ -75,8 +73,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileA.SHA512, HashTypes.SHA512, false)]
 		public void TestVerifyWithUpperCaseHashFromStream(string filename, string expectedHash, HashTypes hashType, bool expectedOutcome)
 		{
-			var fi = new FileInfo(filename);
-			var fs = fi.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+			var fs = GetFileStream(filename);
 
 			var hashResult = fs.VerifyHash(expectedHash.ToUpper(), hashType);
 
@@ -237,6 +234,26 @@ namespace ProphetsWay.Hasher.Tests
 			var hashes = fs.GenerateHashes(requestedHashes);
 
 			VerifyArraysMatch(hashes, hashTypes, expectedHashes);
+		}
+
+		[Theory]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.MD5, true)]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA1, true)]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, true)]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, true)]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, true)]
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, true)]
+#endif
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileA.MD5, false)]
+		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileA.SHA1, false)]
+		public void TestVerifyHashByLengthFromStream(string filename, string expectedHash, bool expectedOutcome)
+		{
+			var fs = GetFileStream(filename);
+
+			var hashResult = fs.VerifyHash(expectedHash.ToUpper());
+
+			hashResult.Should().Be(expectedOutcome);
 		}
 	}
 }
