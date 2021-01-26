@@ -10,7 +10,7 @@ namespace ProphetsWay.Hasher
 		SHA256 = 4,
 		SHA384 = 8,
 		SHA512 = 16,
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
 		RIPEMD160 = 32		
 #endif
 	}
