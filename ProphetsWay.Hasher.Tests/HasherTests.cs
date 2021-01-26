@@ -23,7 +23,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.SHA256, HashTypes.SHA256)]
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.SHA384, HashTypes.SHA384)]
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.SHA512, HashTypes.SHA512)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileA.Name, TestFiles.TestFileA.RIPEMD160, HashTypes.RIPEMD160)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160)]
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileC.RIPEMD160, HashTypes.RIPEMD160)]
@@ -48,7 +48,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512, true)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160, true)]
 #endif
 		public void TestVerifyHashFromStream(string filename, string expectedHash, HashTypes hashType, bool expectedOutcome)
@@ -66,7 +66,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512, true)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160, true)]
 #endif
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileA.SHA512, HashTypes.SHA512, false)]
@@ -85,7 +85,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160)]
 #endif
 		public void TestGenerateHashFromFileInfo(string filename, string expectedHash, HashTypes hashType)
@@ -103,7 +103,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512, true)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160, true)]
 #endif
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileA.SHA512, HashTypes.SHA512, false)]
@@ -122,7 +122,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512, true)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160, true)]
 #endif
 		[InlineData(TestFiles.TestFileC.Name, TestFiles.TestFileA.SHA512, HashTypes.SHA512, false)]
@@ -141,7 +141,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, HashTypes.SHA256)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, HashTypes.SHA384)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, HashTypes.SHA512)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, HashTypes.RIPEMD160)]
 #endif
 		public void TestGenerateHashFromFileName(string filename, string expectedHash, HashTypes hashType)
@@ -209,7 +209,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA256, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA384, true)]
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.SHA512, true)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileB.RIPEMD160, true)]
 #endif
 		[InlineData(TestFiles.TestFileB.Name, TestFiles.TestFileA.MD5, false)]

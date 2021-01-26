@@ -26,7 +26,7 @@ namespace ProphetsWay.Hasher
 				case HashTypes.SHA512:
 					return new SHA512Managed();
 
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 				case HashTypes.RIPEMD160:
 					return new RIPEMD160Managed();
 #endif

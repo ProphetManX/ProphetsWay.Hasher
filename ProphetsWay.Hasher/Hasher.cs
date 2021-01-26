@@ -54,7 +54,7 @@ namespace ProphetsWay.Hasher
 
 				case 40:
 					var hashType = HashTypes.SHA1;
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 					hashType |= HashTypes.RIPEMD160;
 #endif
 					return hashType;

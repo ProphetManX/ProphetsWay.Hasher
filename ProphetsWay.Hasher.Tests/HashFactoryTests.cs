@@ -13,7 +13,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(HashTypes.SHA256, typeof(SHA256Managed))]
 		[InlineData(HashTypes.SHA384, typeof(SHA384Managed))]
 		[InlineData(HashTypes.SHA512, typeof(SHA512Managed))]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(HashTypes.RIPEMD160, typeof(RIPEMD160Managed))]
 #endif
 		public void TestGetHasher(HashTypes hashType, Type type)
@@ -28,7 +28,7 @@ namespace ProphetsWay.Hasher.Tests
 		[InlineData(HashTypes.MD5 | HashTypes.SHA1 | HashTypes.SHA256, 3)]
 		[InlineData(HashTypes.MD5 | HashTypes.SHA1 | HashTypes.SHA256 | HashTypes.SHA384, 4)]
 		[InlineData(HashTypes.MD5 | HashTypes.SHA1 | HashTypes.SHA256 | HashTypes.SHA384 | HashTypes.SHA512, 5)]
-#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48
+#if NET451 || NET452 || NET46 || NET461 || NET471 || NET472 || NET48 || NET50
 		[InlineData(HashTypes.MD5 | HashTypes.SHA1 | HashTypes.SHA256 | HashTypes.SHA384 | HashTypes.SHA512 | HashTypes.RIPEMD160, 6)]
 #endif
 		public void TestGetHashers(HashTypes hashTypes, int numberOfHashers)
